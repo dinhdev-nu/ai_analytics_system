@@ -1,0 +1,186 @@
+# Docker ignore file
+# Files and directories that should not be included in Docker build context
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+!README.md
+docs/
+LICENSE
+CHANGELOG.md
+ROADMAP.md
+FAQ.md
+TROUBLESHOOTING.md
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+SECURITY.md
+PROJECT_STRUCTURE.md
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+circle.yml
+.circleci/
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*~
+.DS_Store
+Thumbs.db
+
+# Environment files (use .env.example instead)
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories
+node_modules/
+vendor/
+venv/
+env/
+.venv/
+
+# Build outputs
+dist/
+build/
+out/
+target/
+bin/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test coverage
+coverage/
+.coverage
+*.cover
+.pytest_cache/
+.tox/
+htmlcov/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Go
+*.test
+*.out
+go.work
+go.work.sum
+
+# JavaScript/Node
+.npm
+.eslintcache
+.yarn/cache
+.pnp.*
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+.cache/
+
+# Build context unnecessary files
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Kubernetes
+k8s/
+*.yaml
+*.yml
+!**/config/*.yml
+!**/config/*.yaml
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Backups
+*.bak
+*.backup
+backups/
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+
+# Certificates and keys
+*.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pfx
+
+# Scripts (often not needed in container)
+manage.sh
+manage.bat
+Makefile
+
+# ML models (large files, mount as volume instead)
+models/*.pkl
+models/*.h5
+models/*.pt
+models/*.pth
+
+# Sample/test data (unless needed)
+sample_data/
+test_data/
+fixtures/
+
+# Jupyter notebooks
+*.ipynb
+.ipynb_checkpoints/
+
+# Graphics and media (unless needed)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.svg
+*.pdf

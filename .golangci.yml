@@ -1,0 +1,164 @@
+# golangci-lint configuration
+# https://golangci-lint.run/usage/configuration/
+
+run:
+  # Timeout for analysis
+  timeout: 5m
+  
+  # Include test files
+  tests: true
+  
+  # Which dirs to skip
+  skip-dirs:
+    - vendor
+    - tmp
+    - bin
+  
+  # Which files to skip
+  skip-files:
+    - ".*\\.pb\\.go$"
+    - ".*_generated\\.go$"
+
+# Output configuration
+output:
+  # Format: colored-line-number|line-number|json|tab|checkstyle|code-climate
+  format: colored-line-number
+  
+  # Print lines of code with issue
+  print-issued-lines: true
+  
+  # Print linter name in the end of issue text
+  print-linter-name: true
+
+# Linters settings
+linters-settings:
+  # Errcheck checks for unchecked errors
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+  
+  # Govet examines Go source code
+  govet:
+    check-shadowing: true
+    enable-all: true
+  
+  # Gofmt checks whether code was gofmt-ed
+  gofmt:
+    simplify: true
+  
+  # Goimports checks import order
+  goimports:
+    local-prefixes: github.com/your-org/ai-analytics
+  
+  # Goconst finds repeated strings that could be replaced by a constant
+  goconst:
+    min-len: 3
+    min-occurrences: 3
+  
+  # Gocyclo computes cyclomatic complexity
+  gocyclo:
+    min-complexity: 15
+  
+  # Misspell checks for commonly misspelled English words
+  misspell:
+    locale: US
+  
+  # Lll reports long lines
+  lll:
+    line-length: 120
+    tab-width: 4
+  
+  # Unused checks for unused constants, variables, functions and types
+  unused:
+    check-exported: false
+  
+  # Revive provides a framework for development of custom rules
+  revive:
+    confidence: 0.8
+    rules:
+      - name: blank-imports
+      - name: context-as-argument
+      - name: context-keys-type
+      - name: dot-imports
+      - name: error-return
+      - name: error-strings
+      - name: error-naming
+      - name: exported
+      - name: if-return
+      - name: increment-decrement
+      - name: var-naming
+      - name: var-declaration
+      - name: package-comments
+      - name: range
+      - name: receiver-naming
+      - name: time-naming
+      - name: unexported-return
+      - name: indent-error-flow
+      - name: errorf
+      - name: empty-block
+      - name: superfluous-else
+      - name: unused-parameter
+      - name: unreachable-code
+      - name: redefines-builtin-id
+
+# Linters to enable
+linters:
+  disable-all: true
+  enable:
+    - errcheck      # Check for unchecked errors
+    - gosimple      # Simplify code
+    - govet         # Vet examines Go source code
+    - ineffassign   # Detect ineffectual assignments
+    - staticcheck   # Staticcheck is go vet on steroids
+    - typecheck     # Like the front-end of a Go compiler
+    - unused        # Check for unused code
+    - gofmt         # Check code formatting
+    - goimports     # Check import order
+    - goconst       # Find repeated strings
+    - gocyclo       # Cyclomatic complexity
+    - misspell      # Check spelling
+    - revive        # Fast, configurable, extensible linter
+    - gosec         # Security problems
+    - bodyclose     # Check HTTP response body is closed
+    - noctx         # Find sending http request without context.Context
+    - rowserrcheck  # Check whether Err of rows is checked
+    - sqlclosecheck # Check sql.Rows and sql.Stmt are closed
+    - unconvert     # Remove unnecessary type conversions
+    - unparam       # Reports unused function parameters
+    - wastedassign  # Finds wasted assignment statements
+
+# Issues configuration
+issues:
+  # Maximum issues count per one linter
+  max-issues-per-linter: 50
+  
+  # Maximum count of issues with the same text
+  max-same-issues: 3
+  
+  # Excluding configuration per-path, per-linter, per-text and per-source
+  exclude-rules:
+    # Exclude some linters from running on tests files
+    - path: _test\.go
+      linters:
+        - gocyclo
+        - errcheck
+        - gosec
+    
+    # Exclude known issues
+    - text: "weak cryptographic primitive"
+      linters:
+        - gosec
+    
+    # Allow TODO comments
+    - text: "Line contains TODO"
+      linters:
+        - godox
+  
+  # Independently of option `exclude` lint should be run on test files
+  exclude-use-default: false
+  
+  # Show only new issues
+  new: false
+  
+  # Fix found issues (if supported by the linter)
+  fix: false

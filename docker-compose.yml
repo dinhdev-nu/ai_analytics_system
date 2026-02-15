@@ -1,0 +1,144 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: ai_analytics_mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: ai_analytics
+    volumes:
+      - mongodb_data:/data/db
+      - ./database/mongodb:/docker-entrypoint-initdb.d
+    networks:
+      - ai_analytics_network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: ai_analytics_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - ai_analytics_network
+
+  # ETL Worker (Go)
+  etl_worker:
+    build:
+      context: ./etl
+      dockerfile: Dockerfile
+    container_name: ai_analytics_etl
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+    environment:
+      MONGODB_URI: mongodb://admin:password123@mongodb:27017
+      MONGODB_DATABASE: ai_analytics
+      ETL_CRON_SCHEDULE: "0 2 * * *"
+      ENVIRONMENT: production
+      LOG_LEVEL: info
+    networks:
+      - ai_analytics_network
+
+  # ML Training Service (Python)
+  ml_training:
+    build:
+      context: ./ml
+      dockerfile: Dockerfile.training
+    container_name: ai_analytics_ml_training
+    restart: "no"
+    depends_on:
+      - mongodb
+    environment:
+      MONGODB_URI: mongodb://admin:password123@mongodb:27017
+      MONGODB_DATABASE: ai_analytics
+      ML_MODEL_PATH: /app/models
+      ENVIRONMENT: production
+    volumes:
+      - ml_models:/app/models
+    networks:
+      - ai_analytics_network
+
+  # ML Prediction Service (Python)
+  ml_prediction:
+    build:
+      context: ./ml
+      dockerfile: Dockerfile.prediction
+    container_name: ai_analytics_ml_prediction
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+      - ml_training
+    environment:
+      MONGODB_URI: mongodb://admin:password123@mongodb:27017
+      MONGODB_DATABASE: ai_analytics
+      ML_MODEL_PATH: /app/models
+      PREDICTION_CRON_SCHEDULE: "0 3 * * *"
+      PREDICTION_MONTHS_AHEAD: 12
+      ENVIRONMENT: production
+    volumes:
+      - ml_models:/app/models
+    networks:
+      - ai_analytics_network
+
+  # Backend API (Go)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ai_analytics_backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
+      - redis
+    environment:
+      API_PORT: 8080
+      API_HOST: 0.0.0.0
+      MONGODB_URI: mongodb://admin:password123@mongodb:27017
+      MONGODB_DATABASE: ai_analytics
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      ENVIRONMENT: production
+      LOG_LEVEL: info
+    networks:
+      - ai_analytics_network
+
+  # Frontend Client (React)
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: ai_analytics_client
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: http://backend:8080/api/v1
+    networks:
+      - ai_analytics_network
+
+volumes:
+  mongodb_data:
+    driver: local
+  redis_data:
+    driver: local
+  ml_models:
+    driver: local
+
+networks:
+  ai_analytics_network:
+    driver: bridge

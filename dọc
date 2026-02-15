@@ -1,0 +1,17 @@
+# 1. Start hệ thống
+docker-compose up -d
+
+# 2. Load sample data
+mongosh mongodb://localhost:27017/ai_analytics < database/mongodb/sample_data.js
+
+# 3. Chạy ETL
+./manage.sh etl
+
+# 4. Train model
+./manage.sh train
+
+# 5. Generate predictions
+./manage.sh predict
+
+# 6. Mở dashboard
+# Browser: http://localhost:3000
